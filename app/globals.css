@@ -1,0 +1,11 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { color-scheme: light; }
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: #fff; color: #111827; }
+button, input, select, textarea { font: inherit; }
+input, select, textarea { max-width: 100%; }
+a { text-decoration: none; color: inherit; }
