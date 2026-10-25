@@ -22,7 +22,9 @@ export async function POST(request: Request) {
     if (!Number.isInteger(quantity) || quantity < 1 || quantity > 99) return jsonError("Each quantity must be between 1 and 99.");
     quantities.set(item.product_id, (quantities.get(item.product_id) || 0) + quantity);
   }
-  for (const [product_id, quantity] of quantities) {
+  
+  // FIXED: Use Array.from so Vercel build doesn't fail
+  for (const [product_id, quantity] of Array.from(quantities.entries())) {
     if (quantity > 99) return jsonError("Maximum quantity per product is 99.");
     cleanItems.push({ product_id, quantity });
   }
@@ -34,11 +36,11 @@ export async function POST(request: Request) {
     .in("id", ids);
   if (productsError) return jsonError("Could not verify product prices. Please try again.", 500);
 
-  const productMap = new Map((products || []).map((product) => [product.id, product]));
+  const productMap = new Map((products || []).map((product) => [product.id, product] as const));
   const orderItems = [];
   let total = 0;
   for (const item of cleanItems) {
-    const product = productMap.get(item.product_id);
+    const product = productMap.get(item.product_id) as any;
     if (!product || !product.published || !product.available) return jsonError("One or more products are no longer available. Please update your cart.");
     const unitPrice = Number(product.price);
     const subtotal = Math.round(unitPrice * item.quantity * 100) / 100;
